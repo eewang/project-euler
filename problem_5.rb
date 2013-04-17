@@ -65,22 +65,16 @@ class Integer
   end
 
   def factor_array
-    # factors = self.primes + self.perfect_multiples() + self.cubes + self.quarts
-    array_add = []
-    total_array = []
-    array_add = self.check_for_primes
+    total_array = self.check_for_primes
     i = 2
-    until array_add.empty?
-      total_array << array_add
-      array_add = self.perfect_multiples(i).collect { |n| n ** (1.00/i).to_f }
-      i += 1
-    end
+    array_add = self.perfect_multiples(i).collect { |n| n ** (1.00/i).to_f }
+    total_array << array_add
     total_array
     # factors.inject(1) { |result, num| result * num }
   end
 
   def factor_array_flatten
-    self.factor_array.flatten.inject(1) { |result, num| result * num } 
+    self.factor_array.flatten.inject(1) { |result, num| result * num }.to_i 
   end
 
   def factor_array_check
@@ -106,6 +100,6 @@ class Integer
 
 end
 
-num = 20
+puts 20.factor_array_flatten # => 232792560
 
-binding.pry
+# binding.pry
