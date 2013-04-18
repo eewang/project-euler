@@ -156,9 +156,6 @@ class Product
       sub_array = (self.start..self.finish).collect { |n| self.create_array[n] }
       product = sub_array.inject(1) { |result, num| result * num }
       self.max_product = product if self.max_product_compare(product)
-      # if product > self.max_product
-      #   self.max_product = product
-      # end
       self.start += 1
       self.finish += 1
     end
