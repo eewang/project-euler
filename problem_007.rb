@@ -66,27 +66,24 @@ class Integer
     self.check_for_primes.size
   end
 
-  def next_prime
-    next_prime = self
-    if self.prime?
-      next_prime += 1
-    end
-    until next_prime.prime?
-      next_prime += 1
-    end
-    next_prime
+  def self.prime_search(*searches)
+    searches.each do |search|
+      define_method "#{search}_prime" do
+        prime_test = self
+        case search
+        when :next
+          prime_test += 1 if self.prime?
+          prime_test += 1 until prime_test.prime?
+        when :previous
+          prime_test -= 1 if self.prime?
+          prime_test -= 1 until prime_test.prime?
+        end
+        prime_test
+      end
+    end 
   end
 
-  def previous_prime
-    previous_prime = self
-    if self.prime?
-      previous_prime -= 1
-    end
-    until previous_prime.prime?
-      previous_prime -= 1
-    end
-    previous_prime
-  end
+  prime_search :next, :previous
 
   def find_prime(index)
     if self.prime?
@@ -96,23 +93,22 @@ class Integer
     end
     puts "#{starting_prime.which_prime?} prime: #{starting_prime}"
     starting_index = starting_prime.which_prime?
+    move_to_next_prime(starting_prime, starting_index, index)
+  end
+
+  def move_to_next_prime(start_prime, start_index, target_index)
     case 
-    when starting_index == index
-      starting_prime
-    when starting_index < index
-      next_num = starting_prime.next_prime
-      next_num.find_prime(index)
-    when starting_index > index
-      next_num = starting_prime.previous_prime
-      next_num.find_prime(index)
+    when start_index == target_index
+      start_prime
+    when start_index < target_index
+      next_num = start_prime.next_prime
+      next_num.find_prime(target_index)
+    when start_index > target_index
+      next_num = start_prime.previous_prime
+      next_num.find_prime(target_index)
     end
   end
 
-  def  
-  end
-
 end
-
-
 
 binding.pry
