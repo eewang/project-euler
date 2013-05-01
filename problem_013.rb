@@ -115,7 +115,7 @@
 
 # ANSWER
 
-# => 
+# => 5537376230
 
 require 'pry'
 
@@ -221,9 +221,17 @@ num = "37107287533902102798797998220837590246510135740250
 53503534226472524250874054075591789781264330331690
 ".split("\n")
 
-num.collect! { |n| n.split("").collect! { |i| i.to_i } }
+num.collect! { |n| n.split("").reverse.collect! { |i| i.to_i } }
 
 class Array
+
+  def calculate_digits(move)
+    sum = 0
+    (0..move).each do |i|
+      sum += self.calculate_position_sum(i) * (10**(i))
+    end
+    sum
+  end
 
   def calculate_position_sum(position)
     sums = 0
@@ -234,16 +242,55 @@ class Array
   end
 
   def carryover(position)
-    self.calculate_sum(position).to_s.split("")[0..-2]
+    self.calculate_position_sum(position).to_s.split("").reverse.collect { |i| i.to_i}
   end
 
-  def calculate_group_sum
-    sum_array = []
-    (0..1).each do |i|
-      self.calculate_position_sum(self[0].length - i)
+  def calculate_group_sum(move)
+    result_array = []
+    sub_array = []
+    (0..move).each do |i|
+      sub_array = self.carryover(i)
+      result_array[i] ? result_array[i] += sub_array[0] : result_array[i] ||=sub_array[0]
+      result_array[i+1] ? result_array[i+1] += sub_array[1] : result_array[i+1] ||= sub_array[1]
+      result_array[i+2] ? result_array[i+2] += sub_array[2] : result_array[i+2] ||= sub_array[2]
     end
+    result_array.move_digits
+  end
+
+  def move_digits
+    i = 0
+    while self.any? { |i| i > 9 }
+      i = 0 if i == 1
+      self[0..-1].map! do |item|
+        if item > 9
+          sub_array = item.to_s.split("").reverse.collect { |i| i.to_i }
+          self[self.index(item) + 1] ? self[self.index(item) + 1] += sub_array[1] : self[self.index(item) + 1] ||= sub_array[1]
+          self[self.index(item)] = sub_array[0]
+          i = 1
+          break
+        end
+        break if i == 1
+      end
+    end
+    self
+  end
+
+  def solve_with_calculate_group_sum(digit_count)
+    self.calculate_group_sum(self[0].length - 1).reverse[0..(digit_count - 1)]
+  end
+
+  def solve_with_calculate_digits(digit_count)
+    self.calculate_digits(self[0].length - 1).to_s.split("")[0..(digit_count - 1)].collect { |i| i.to_i }
   end
 
 end
+
+# METHOD 1
+
+num.solve_with_calculate_digits(10) # => [5, 5, 3, 7, 3, 7, 6, 2, 3, 0]
+
+# METHOD 2
+
+num.solve_with_calculate_group_sum(10) # => [5, 5, 3, 7, 3, 7, 6, 2, 3, 0]
 
 binding.pry
